@@ -1,0 +1,16 @@
+name: ps5-bot
+on:
+  schedule: [{cron: "*/5 * * * *"}]
+  workflow_dispatch:
+permissions: {contents: write}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install requests && python bot.py
+        env: {NTFY_TOPIC: "${{ secrets.NTFY_TOPIC }}"}
+      - run: |
+          git config user.name bot && git config user.email bot@users.noreply.github.com
+          git add seen.json && git commit -m "update" || true
+          git push
