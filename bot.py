@@ -1,8 +1,8 @@
 import json, os, re, requests
 TOPIC = os.environ["NTFY_TOPIC"]
 SEARCHES = {
-    "ps5":    {"keyword": "ps5",            "max": 554, "must": ""},
-    "xboxss": {"keyword": "xbox series s",  "max": 334, "must": "series s"},
+    "ps5":    {"keyword": "ps5",           "min": 200, "max": 554, "must": ["ps5", "playstation 5"]},
+    "xboxss": {"keyword": "xbox series s", "min": 100, "max": 334, "must": ["series s"]},
 }
 H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"}
 
@@ -27,7 +27,9 @@ for name, s in SEARCHES.items():
         title = ad.get("description", "")
         try: price = float(attr(ad, "PRICE") or 0)
         except ValueError: continue
-        if not (0 < price <= s["max"]) or s["must"] not in title.lower() or ad["id"] in old: continue
+        if ad["id"] in old: continue
+        if not (s["min"] <= price <= s["max"]): continue
+        if not any(m in title.lower() for m in s["must"]): continue
         old.add(ad["id"])
         if not first:
             link = "https://www.willhaben.at/iad/" + (attr(ad, "SEO_URL") or "")
