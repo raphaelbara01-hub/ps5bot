@@ -43,6 +43,7 @@ for name, s in SEARCHES.items():
         if not (s["min"] <= price <= s["max"]): continue
         if not any(m in title.lower() for m in s["must"]): continue
         d = dist_km(ad)
+        print("CHECK:", name, price, attr(ad, "LOCATION"), "km:", None if d is None else round(d), title)
         if d is not None and d > RADIUS_KM: continue
         old.add(ad["id"])
         if not first:
